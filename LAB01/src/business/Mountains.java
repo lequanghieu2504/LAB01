@@ -23,7 +23,7 @@ import tools.Acceptable;
 
 public class Mountains {
 
-    private String pathFile = "D:\\FU_25SP\\LAB211\\LAB01\\MountainList.csv";
+    private String pathFile = "MountainList.csv";
     private List<Mountain> mountainList;
 
     public Mountains() {

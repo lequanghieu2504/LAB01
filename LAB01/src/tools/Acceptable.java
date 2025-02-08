@@ -22,6 +22,7 @@ public interface Acceptable {
     public final String VNPT_VALID = "^(081|082|083|084|085|088|091|094)\\d{7}$";
     public final String EMAIL_VALID = "^[\\w-\\.]+@[\\w-]+\\.com$" ;
     public final String CODE_VALID = "^[1-9]|1[0-3]";
+    public final String YN_VALID = "^[YyNn]$";
     
     public static boolean isValid(String data, String pattern){
         return data.matches(pattern);

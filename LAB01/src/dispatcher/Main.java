@@ -5,8 +5,6 @@
  */
 package dispatcher;
 
-import business.Mountains;
-import business.Students;
 import tools.Menu;
 
 /**
@@ -16,10 +14,6 @@ import tools.Menu;
 public class Main {
 
     public static void main(String[] args) {
-        Mountains mt = new Mountains();
-        Students sts = new Students();
-        sts.readFromFile();
-        mt.readFromFile();
         Menu menu = new Menu();
         menu.showMenu();
     }

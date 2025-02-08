@@ -1,7 +1,6 @@
 package model;
 import java.io.Serializable;
 import tools.Acceptable;
-import tools.Inputter;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -38,7 +37,7 @@ public class Student implements Serializable{
         this.name = name;
         this.phone = phone;
         this.mountainCode = mountainCode;
-        this.tuitionFee = tuitionFee;
+        this.tuitionFee = calTuitionFee(getPhone());
     }
 
     public String getId() {
@@ -68,6 +67,7 @@ public class Student implements Serializable{
 
     public void setPhone(String phone) {
             this.phone = phone;
+            setTutionFee(calTuitionFee(phone));
     }
 
     public String getEmail() {
@@ -75,11 +75,11 @@ public class Student implements Serializable{
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = email.toLowerCase();
     }
 
     public String getMountainCode() {
-        if (Integer.parseInt(mountainCode)<9){
+        if (Integer.parseInt(mountainCode)<=9){
             return "MT0" + mountainCode;
         }
         else {
@@ -93,14 +93,23 @@ public class Student implements Serializable{
 
     public double getTuitionFee() {
         return tuitionFee;
-    }
+    } 
 
-    public void setTutionFee() {
+    public void setTutionFee(double tuitionFee) {
         if (getPhone().matches(Acceptable.VNPT_VALID)||getPhone().matches(Acceptable.VIETTEL_VALID)){
             this.tuitionFee = 6000000*0.65;
         }
         else{
             this.tuitionFee=6000000;
+        }
+    }
+    
+    public double calTuitionFee(String phone){
+         if (phone.matches(Acceptable.VNPT_VALID)||phone.matches(Acceptable.VIETTEL_VALID)){
+            return 6000000*0.65;
+        }
+        else{
+            return 6000000;
         }
     }
 
@@ -115,6 +124,7 @@ public class Student implements Serializable{
                 truncateOrPad(fee, 15));
     }
     // Hàm hỗ trợ để cắt chuỗi hoặc điền thêm khoảng trắng
+    
 
     private String truncateOrPad(String value, int length) {
         if (value == null) {

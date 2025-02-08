@@ -1,10 +1,10 @@
 package tools;
 
 import java.util.Scanner;
-import java.util.*;
+import java.util.List;
 import model.Student;
-import business.Students;
-import model.StatisticalInfo;
+import business.*;
+import java.util.InputMismatchException;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -18,11 +18,16 @@ import model.StatisticalInfo;
 public class Menu {
 
     private Scanner scanner = new Scanner(System.in);
+    public Mountains mt = new Mountains();
     public Students stu = new Students();
     public Student st = new Student();
+    public Inputter input = new Inputter();
+    public List<Student> stl = stu.getStudentList();
 
     public void showMenu() {
-
+        mt.readFromFile();
+        stu.readFromFile();
+        
         int choice;
 
         do {
@@ -72,8 +77,12 @@ public class Menu {
                 case 8:
                     saveToFile();
                     break;
+                    
+                 case 9:
+                      exit();
+                      return;
             }
-        } while (choice != 9);
+        } while (choice !=9);
     }
 
     private int getInput() {
@@ -104,14 +113,13 @@ public class Menu {
     }
 
     public void searchStudentByName() {
-        String name = scanner.next();
-        stu.searchByName(name);
+        stu.searchByName(st.getPhone());
     }
 
     public void filterDataByCampusCode() {
         System.out.println("Here is Campus Map:");
         System.out.println("SE : HO CHI MINH");
-        System.out.println("CE: CAN THO");
+        System.out.println("CE : CAN THO");
         System.out.println("DE : DA NANG"); 
         System.out.println("HE : HA NOI");
         System.out.println("QE : QUY NHON");
@@ -126,6 +134,11 @@ public class Menu {
     public void saveToFile(){
         stu.saveToFile();
     }
+    
+    public void exit(){
+        stu.exit();
+    }
+    
     
     
 

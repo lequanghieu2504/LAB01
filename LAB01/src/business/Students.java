@@ -9,6 +9,7 @@ package business;
  *
  * @author hieuh
  */
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -30,25 +31,25 @@ import tools.Inputter;
 
 public class Students {
 
-    private String pathFile = "D:\\FU_25SP\\LAB211\\LAB01\\registrations\\Registration.dat";
+    private String pathFile = "Registration.dat";
     private boolean isSaved;
     public Inputter input = new Inputter();
     public Mountains mt = new Mountains();
     public List<Student> studentList;
     public List<Student> studentList1;
     private Scanner scanner = new Scanner(System.in);
-
+    
     public Students() {
         super();
         this.studentList = new ArrayList<>();
         this.studentList1 = new ArrayList<>();
         this.isSaved = false;
 
-        studentList.add(new Student("SE192251", "Quang Hieu", "0376371939", "1", 3900000));
-        studentList.add(new Student("SE654321", "Quynh Tram", "0932231928", "2", 6000000));
-        studentList.add(new Student("SE654322", "Hieu Tram", "0932231938", "3", 6000000));
-        studentList.add(new Student("SE654323", "Hieu Hieu", "0932231938", "3", 6000000));
-        studentList.add(new Student("SE654324", "Tram Tram", "0932231938", "3", 6000000));
+//        studentList.add(new Student("SE192251", "Quang Hieu", "0376371939", "1", 3900000));
+//        studentList.add(new Student("SE654321", "Quynh Tram", "0932231928", "2", 6000000));
+//        studentList.add(new Student("SE654322", "Hieu Tram", "0932231938", "3", 6000000));
+//        studentList.add(new Student("SE654323", "Hieu Hieu", "0932231938", "3", 6000000));
+//        studentList.add(new Student("SE654324", "Tram Tram", "0932231938", "3", 6000000));
     }
 
     public Students(String pathFile, boolean isSaved, Students studentsList) {
@@ -94,7 +95,7 @@ public class Students {
             if (Acceptable.VIETTEL_VALID.contains(phone) || Acceptable.VNPT_VALID.contains(phone)) {
                 tuitionFee *= 0.65;
             }
-            x.setTutionFee();
+            x.setTutionFee(0);
 
             studentList.add(x);
 //            saveToFile();
@@ -130,7 +131,7 @@ public class Students {
 
                 case 2:
                     temp.setPhone(input.inputAndLoop("Update PHONE: ", Acceptable.PHONE_VALID));
-                    temp.setTutionFee();
+                    temp.calTuitionFee(temp.getPhone());
                     System.out.println("Update successfully !");
                     break;
 
@@ -187,7 +188,7 @@ public class Students {
                     found = true;
                     break;
                 } else if (confirm.equalsIgnoreCase("n")) {
-                    break;
+                    return;
                 }
             }
         }
@@ -263,12 +264,14 @@ public class Students {
         // Hiển thị kết quả
         System.out.println("Statistics of Registration by Mountain Peak:");
         System.out.println("----------------------------------------------------------");
-        System.out.printf("%-10s | %-20s | %-15s%n", "Peak Name", "Number of Particinputants", "Total Cost");
+        System.out.printf("%-10s | %-22s | %-15s%n", "Peak Name", "Number of Particinputants", "Total Cost");
         System.out.println("----------------------------------------------------------");
 
         for (String mountain : particinputantCount.keySet()) {
-            System.out.printf("%-10s | %-22d | %,10.0f%n", mountain, particinputantCount.get(mountain), totalCost.get(mountain));
+            System.out.printf("%-10s | %-25d | %,10.0f%n", mountain, particinputantCount.get(mountain), totalCost.get(mountain));
         }
+        System.out.println("----------------------------------------------------------");
+        System.out.println("");
     }
 
     public void saveToFile() {
@@ -279,7 +282,7 @@ public class Students {
         try {
             File f = new File(this.pathFile);
             FileOutputStream fos = null;
-            // tạo file outpúttream ánh xạ đến File Object
+
             fos = new FileOutputStream(f);
             // Tạo objectoutpúttream để chuyển dữ liệu xuống thiết bị
             ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -299,40 +302,114 @@ public class Students {
         }
     }
 
-    public void readFromFile() {
-        FileInputStream fis = null;
-        try {
-            File f = new File(this.pathFile);
-            if (!f.exists()) {
-                System.out.println("Registration.dat file is not found !.");
-                return;
-            }
-            fis = new FileInputStream(f);
-            ObjectInputStream ois = new ObjectInputStream(fis);
 
-            while (fis.available() > 0) {
+    
+//    public void readFromFile() {
+//        FileInputStream fis = null;
+//        try {
+//            File f = new File(this.pathFile);
+//            if (!f.exists()) {
+//                System.out.println("Registration.dat file is not found !.");
+//                return;
+//            }
+//            fis = new FileInputStream(f);
+//            ObjectInputStream ois = new ObjectInputStream(fis);
+//
+//            if (studentList == null) {
+//                studentList = new ArrayList<>();
+//            }
+//
+//            while (fis.available() > 0) {
+//                Student x = (Student) ois.readObject();
+//                studentList.add(x);
+//            }
+//
+//            // Dong object sau ki doc xong
+//            ois.close();
+//            this.isSaved = true;
+//        } catch (FileNotFoundException e) {
+//            Logger.getLogger(Students.class.getName()).log(Level.SEVERE, null, e);
+//        } catch (IOException e) {
+//            Logger.getLogger(Students.class.getName()).log(Level.SEVERE, null, e);
+//        } catch (ClassNotFoundException e) {
+//            Logger.getLogger(Students.class.getName()).log(Level.SEVERE, null, e);
+//        } catch (Exception e) {
+//            Logger.getLogger(Students.class.getName()).log(Level.SEVERE, null, e);
+//        } finally {
+//            try {
+//                if (fis != null) {
+//                    fis.close();
+//                }
+//            } catch (IOException e) {
+//                Logger.getLogger(Students.class.getName()).log(Level.SEVERE, null, e);
+//            }
+//        }
+//    }
+//    
+    
+    public void readFromFile() {
+    FileInputStream fis = null;
+    ObjectInputStream ois = null;
+    try {
+        File f = new File(this.pathFile);
+        if (!f.exists()) {
+            System.out.println("Registration.dat file is not found!");
+            return;
+        }
+
+        fis = new FileInputStream(f);
+        ois = new ObjectInputStream(fis);
+
+        if (studentList == null) {
+            studentList = new ArrayList<>();
+        }
+
+        // Đọc các đối tượng từ tệp cho đến khi gặp EOF
+        while (true) {
+            try {
                 Student x = (Student) ois.readObject();
                 studentList.add(x);
-            }
-
-            // Dong object sau ki doc xong
-            ois.close();
-            this.isSaved = true;
-        } catch (FileNotFoundException e) {
-            Logger.getLogger(Students.class.getName()).log(Level.SEVERE, null, e);
-        } catch (IOException e) {
-            Logger.getLogger(Students.class.getName()).log(Level.SEVERE, null, e);
-        } catch (ClassNotFoundException e) {
-            Logger.getLogger(Students.class.getName()).log(Level.SEVERE, null, e);
-        } catch (Exception e) {
-            Logger.getLogger(Students.class.getName()).log(Level.SEVERE, null, e);
-        } finally {
-            try {
-                fis.close();
-            } catch (IOException e) {
-                Logger.getLogger(Students.class.getName()).log(Level.SEVERE, null, e);
+            } catch (EOFException e) {
+                break;  // Dừng khi gặp EOF (End Of File)
             }
         }
+
+        this.isSaved = true;
+//        showAll(studentList);
+
+    } catch (FileNotFoundException e) {
+        Logger.getLogger(Students.class.getName()).log(Level.SEVERE, "File not found", e);
+    } catch (IOException e) {
+        Logger.getLogger(Students.class.getName()).log(Level.SEVERE, "Error reading the file", e);
+    } catch (ClassNotFoundException e) {
+        Logger.getLogger(Students.class.getName()).log(Level.SEVERE, "Class not found", e);
+    } catch (Exception e) {
+        Logger.getLogger(Students.class.getName()).log(Level.SEVERE, "Unexpected error", e);
+    } finally {
+        try {
+            if (ois != null) {
+                ois.close();  // Đảm bảo ObjectInputStream luôn được đóng
+            }
+            if (fis != null) {
+                fis.close();  // Đảm bảo FileInputStream luôn được đóng
+            }
+        } catch (IOException e) {
+            Logger.getLogger(Students.class.getName()).log(Level.SEVERE, "Error closing the streams", e);
+        }
     }
+}
+
+    public void exit() {
+        if (!isSaved) {
+            String text = input.inputAndLoop("Do you want to save changes before exit? (Y/N): ", Acceptable.YN_VALID);
+            if (text.equalsIgnoreCase("Y")) {
+                saveToFile();
+            } else {
+                return;
+            }
+        }
+        return;
+    }
+
 
 }
